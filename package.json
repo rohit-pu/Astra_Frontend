@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -10,15 +13,11 @@
     "watch": "ng build --watch --configuration development"
   },
   "dependencies": {
-    "@angular/animations": "^19.2.0",
-    "@angular/cdk": "^19.2.0",
     "@angular/common": "^19.2.0",
     "@angular/compiler": "^19.2.0",
     "@angular/core": "^19.2.0",
-    "@angular/forms": "^19.2.0",
     "@angular/platform-browser": "^19.2.0",
     "@angular/router": "^19.2.0",
-    "@primeng/themes": "^19.1.4",
     "@primeuix/themes": "^3.1.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.1.4",

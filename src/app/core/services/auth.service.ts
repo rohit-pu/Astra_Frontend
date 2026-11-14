@@ -12,11 +12,11 @@ export class AuthService {
   private readonly apiUrl = environment.apiUrl;
 
   getMe(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/auth/me`);
+    return this.http.get<User>(`${this.apiUrl}/api/auth/me`);
   }
 
   logout(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/logout`, {});
+    return this.http.post<{ message: string }>(`${this.apiUrl}/api/auth/logout`, {});
   }
 }
 

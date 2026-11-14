@@ -114,7 +114,7 @@ export class LoginComponent implements OnInit {
   }
 
   signInWithGoogle(): void {
-    window.location.href = `${environment.apiUrl}/auth/google`;
+    window.location.href = `${environment.apiUrl}/api/auth/google`;
   }
 
   openHelp(): void {

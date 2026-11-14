@@ -22,7 +22,7 @@ Astra Frontend is a modern, responsive web application for the Astra Academic Po
 ## Features
 - **Modern Angular 19 Architecture**: 100% Standalone components and functional routing (no legacy `NgModule`).
 - **Google OAuth Integration**: Direct authentication through backend Google OAuth flow with session cookies.
-- **Role-Based Routing & Dashboards**: Dedicated UI views for `Student`, `Faculty`, and `Admin` users.
+- **Authenticated Dashboard**: Protected `/dashboard` view loaded upon successful Google authentication, displaying authenticated user profile details.
 - **PrimeNG 19 Design System**: Styled with `@primeuix/themes` (Aura preset) and Tailwind CSS.
 - **HTTP Interceptors**: Automatic `withCredentials: true` injection for secure cross-origin cookie sharing.
 - **Graceful Error Handling**: PrimeNG alert banners and user feedback for unauthorized access attempts (`access_denied`).
@@ -32,7 +32,7 @@ Astra Frontend is a modern, responsive web application for the Astra Academic Po
 ## Tech Stack
 - **Framework**: Angular 19 (Standalone Components, Signals, Functional Guards)
 - **UI Component Library**: PrimeNG 19 (`primeng`, `@primeuix/themes`, `primeicons`)
-- **Styling**: Tailwind CSS (v3), PostCSS, Autoprefixer
+- **Styling**: Tailwind CSS v4 with @tailwindcss/postcss
 - **HTTP Client**: Angular `provideHttpClient` with functional interceptors
 - **Polyfills**: Zone.js polyfill enabled in bootstrap
 
@@ -40,7 +40,7 @@ Astra Frontend is a modern, responsive web application for the Astra Academic Po
 
 ## Prerequisites
 Before setting up the frontend, ensure you have:
-1. **Node.js** (v18.0.0 or higher) - [Download Node.js](https://nodejs.org/)
+1. **Node.js** (v22.0.0 or higher, Node 22 LTS) - [Download Node.js](https://nodejs.org/)
 2. **Angular CLI** (v19 or higher):
    ```bash
    npm install -g @angular/cli
@@ -70,14 +70,13 @@ frontend/
 │   │   │   ├── auth/
 │   │   │   │   └── login.component.ts    # Clean login page with Google sign-in button & alerts
 │   │   │   └── dashboard/
-│   │   │       └── dashboard.component.ts# Dashboard dynamically rendered by user role
+│   │   │       └── dashboard.component.ts# Portal dashboard view for authenticated user
 │   │   ├── shared/                       # Reusable UI widgets and directives
 │   │   ├── app.component.ts              # Root shell component
 │   │   ├── app.config.ts                 # App providers (PrimeNG Aura theme, HttpClient, Router)
 │   │   └── app.routes.ts                 # Application route declarations
 │   ├── environments/
-│   │   ├── environment.ts                # Development environment (API URL)
-│   │   └── environment.prod.ts           # Production environment
+│   │   └── environment.ts                # Application environment (API URL)
 │   ├── index.html                        # Application entry HTML
 │   ├── main.ts                           # Application bootstrap (imports zone.js)
 │   └── styles.css                        # Tailwind CSS imports & PrimeNG theme rules
@@ -111,7 +110,7 @@ Ensure `apiUrl` matches the address of your running Astra Backend instance.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/rohit-pu/Astra_Frontend.git
+   git clone https://github.com/your-org/Astra_Frontend.git
    cd Astra_Frontend
    ```
 
@@ -154,7 +153,7 @@ sequenceDiagram
     participant DB as PostgreSQL DB
 
     User->>Frontend: Click "Sign in with Google"
-    Frontend->>Backend: Navigate to /auth/google
+    Frontend->>Backend: Navigate to /api/auth/google
     Backend->>Google: Redirect to Google OAuth Consent
     User->>Google: Authenticate & Approve
     Google->>Backend: Callback with authorization code
@@ -162,9 +161,9 @@ sequenceDiagram
     Backend->>DB: Query active user by email
     alt User exists & active
         Backend->>Frontend: Set auth_token cookie & redirect to /dashboard
-        Frontend->>Backend: GET /auth/me (withCredentials: true)
+        Frontend->>Backend: GET /api/auth/me (withCredentials: true)
         Backend-->>Frontend: Return User Profile & Role
-        Frontend->>User: Display Role-Based Dashboard
+        Frontend->>User: Display Dashboard
     else User not registered / inactive
         Backend->>Frontend: Redirect to /login?error=access_denied
         Frontend->>User: Display "This Google account is not authorised" alert
@@ -173,19 +172,21 @@ sequenceDiagram
 
 ---
 
-## Routing & Role-Based Route Guards
+## Routing & Route Guards
 
 Routes are defined in `src/app/app.routes.ts`:
 
 - `/login`: Public login page.
-- `/dashboard`: Protected by `authGuard`. Displays dashboard based on user role (`Student`, `Faculty`, `Admin`).
+- `/dashboard`: Protected by `authGuard`. Displays dashboard for authenticated users.
 - `**`: Wildcard redirecting to `/login`.
 
 The `authGuard` functional guard (`src/app/core/guards/auth.guard.ts`):
-1. Calls `authService.checkAuth()` to verify the session with the backend.
-2. If authenticated, grants access to the route.
-3. If not authenticated, redirects to `/login`.
-4. If role requirements are specified on the route (e.g., `data: { roles: ['Admin'] }`), ensures the active role is permitted.
+1. Calls `authService.getMe()` to verify active session authentication with the backend.
+2. If authenticated, grants access to the dashboard.
+3. If unauthenticated or expired, redirects the user to `/login`.
+
+### Planned, not implemented
+- Dedicated role-specific dashboards and persona views for `Student`, `Faculty`, and `Admin` roles. Currently, all authenticated users share the single `/dashboard` route.
 
 ---
 
